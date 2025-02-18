@@ -22,7 +22,8 @@ export class TikTokCommentProcessor extends WorkerHost {
           const currentTime = Date.now();
           const timeDiff = currentTime - createdAt;
           console.log(this.websocketService.conversationEnd);
-          //If the comment create time is longer than 2 min, skip it
+
+          // If the comment create time is longer than 2 min, skip it
           if (
             timeDiff >= 1000 * 60 * 60 * 60 ||
             !this.websocketService.conversationEnd

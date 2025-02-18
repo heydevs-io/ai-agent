@@ -10,6 +10,8 @@ import { WebSocketService } from './queue/websocket.service';
   path: 'tiktok',
 })
 export class TikTokCommentController {
+  private tiktokLiveConnection: WebcastPushConnection;
+
   constructor(
     @InjectQueue(TIK_TOK_COMMENT_QUEUE) private readonly queue: Queue,
     private readonly webSocketService: WebSocketService,
@@ -32,25 +34,32 @@ export class TikTokCommentController {
 
   @Get(':username')
   getLiveComment(@Param('username') username: string) {
+    if (this.tiktokLiveConnection) {
+      this.tiktokLiveConnection.disconnect();
+    }
+
     // Username of someone who is currently live
     const tiktokUsername = username;
 
     // Create a new wrapper object and pass the username
-    const tiktokLiveConnection = new WebcastPushConnection(tiktokUsername);
+    this.tiktokLiveConnection = new WebcastPushConnection(tiktokUsername);
 
     // Connect to the chat (await can be used as well)
-    tiktokLiveConnection
+    this.tiktokLiveConnection
       .connect()
       .then((state) => {
         console.info(`Connected to roomId ${state.roomId}`);
       })
       .catch((err) => {
         console.error('Failed to connect', err);
+        this.webSocketService.conversationEnd = true;
+        // this.getLiveComment(username);
       });
 
     // Define the events that you want to handle
     // In this case we listen to chat messages (comments)
-    tiktokLiveConnection.on('chat', (data) => {
+    this.tiktokLiveConnection.on('chat', (data) => {
+      console.log(`${data.nickname}: ${data.comment}`);
       this.queue.add(TIK_TOK_COMMENT_JOBS.COMMENT_SEND_TO_LLM, {
         wsUrl: WS_URL,
         comment: data.comment,
@@ -58,5 +67,13 @@ export class TikTokCommentController {
         createdAt: data.createTime,
       });
     });
+  }
+
+  @Get('stop')
+  stop() {
+    this.webSocketService.conversationEnd = true;
+    if (this.tiktokLiveConnection) {
+      this.tiktokLiveConnection.disconnect();
+    }
   }
 }

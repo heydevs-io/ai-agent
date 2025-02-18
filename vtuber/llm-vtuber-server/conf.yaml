@@ -17,7 +17,7 @@ system_config:
 character_config:
   conf_name: "unhelpful_ai"
   conf_uid: "unhelpful_ai"
-  live2d_model_name: "alexia"
+  live2d_model_name: "shizuku-local"
 
   # ============== Prompts ==============
 
@@ -360,8 +360,8 @@ character_config:
 
     styletts2:
       # StyleTTS2 API configuration
-      api_url: "https://eb7f-18-136-16-101.ngrok-free.app/api/styletts2"
-      voice_description: "Trump"
+      api_url: "https://dev.api.tts.screentor.com/api/styletts2"
+      voice_description: "DonaldTrump"
 
   tts_preprocessor_config:
     # settings regarding preprocessing for text that goes into TTS
