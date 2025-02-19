@@ -195,12 +195,15 @@ class DifyLLMAgent(AgentInterface):
                         "role": msg["role"],
                         "content": content
                     })
-
             async with self._session.post(
                 f"{self._api_endpoint}/chat-messages",
                 headers=headers,
                 json={
-                    "inputs": {},
+                    "inputs": {
+                        "agent_name": "trump",
+                        "twitter_user_name": "realDonaldTrump",
+                        "mode": "streaming"
+                    },
                     "query": dify_messages[-1]["content"],  # Latest user message
                     "response_mode": "streaming",
                     "conversation_id": self._conversation_id,
@@ -232,19 +235,8 @@ class DifyLLMAgent(AgentInterface):
                                             yield text
                                     elif event_type == "workflow_finished":
                                         # Handle end of conversation
-                                        if json_data.get("data", {}).get("conversation_id"):
-                                            self._conversation_id = json_data["data"]["conversation_id"]
-                                            if self._current_history_uid:
-                                                update_metadate(
-                                                    self._current_conf_uid,
-                                                    self._current_history_uid,
-                                                    {
-                                                        "conversation_id": self._conversation_id,
-                                                        "agent_type": self.AGENT_TYPE
-                                                    },
-                                                )
-                                                logger.info(f"Updated conversation ID: {self._conversation_id}")
-                                
+                                        if json_data.get("conversation_id"):
+                                            self._conversation_id = json_data.get("conversation_id")
                                 except json.JSONDecodeError as je:
                                     logger.error(f"JSON decode error: {je}")
                                     logger.error(f"Problematic data: {data}")

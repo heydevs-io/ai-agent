@@ -54,7 +54,7 @@ character_config:
       dify_llm_agent:
         # Dify.AI API configuration
         api_endpoint: "https://dev.dify-api.nimspace.com/v1" # Replace with your Dify API endpoint
-        api_key: "app-LuOhu2JyKboJdJgn1yFkdr6G" # Replace with your Dify API key
+        api_key: "app-Qj7L4dvAvMNGe0Fzhqp3WZBl" # Replace with your Dify API key
 
       mem0_agent:
         vector_store:
